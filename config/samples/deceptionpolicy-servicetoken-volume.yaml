@@ -1,0 +1,27 @@
+apiVersion: research.dynatrace.com/v1alpha1
+kind: DeceptionPolicy
+metadata:
+  name: deceptionpolicy-servicetoken-volume
+spec:
+  strictValidation: true
+  mutateExisting: true
+
+  traps:
+    - filesystemHoneytoken:
+        filePath: /run/secrets/koney/service_token
+        fileContent: >
+          admin:password
+        readOnly: true
+
+      match:
+        any:
+          - resources:
+              containerSelector: "*"
+              selector:
+                matchLabels:
+                  demo.koney/honeytoken: "true"
+
+      decoyDeployment:
+        strategy: volumeMount
+      captorDeployment:
+        strategy: tetragon

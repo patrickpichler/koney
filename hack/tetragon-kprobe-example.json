@@ -1,0 +1,93 @@
+{
+  "process_kprobe": {
+    "process": {
+      "exec_id": "bWluaWt1YmU6NzA4MTk1MDI1NjU3MjoyNTg3NA==",
+      "pid": 25874,
+      "uid": 0,
+      "cwd": "/run/secrets/koney",
+      "binary": "/usr/bin/cat",
+      "arguments": "service_token",
+      "flags": "execve clone",
+      "start_time": "2025-01-02T18:27:10.051298772Z",
+      "auid": 4294967295,
+      "pod": {
+        "namespace": "koney-demo",
+        "name": "koney-demo-deployment-5bcbd78875-q7lvx",
+        "container": {
+          "id": "docker://747c5d1509f1b8b46593c526da670e0609bacaea89b94238ef6cf39b333f9ec4",
+          "name": "nginx",
+          "image": {
+            "id": "docker-pullable://nginx@sha256:42e917aaa1b5bb40dd0f6f7f4f857490ac7747d7ef73b391c774a41a8b994f15",
+            "name": "nginx:latest"
+          },
+          "start_time": "2025-01-02T17:49:28Z",
+          "pid": 164
+        },
+        "pod_labels": {
+          "app": "koney-demo-pod",
+          "demo.koney/honeytoken": "true",
+          "k8s:io.kubernetes.pod.namespace": "koney-demo",
+          "pod-template-hash": "5bcbd78875"
+        },
+        "workload": "koney-demo-deployment",
+        "workload_kind": "Deployment"
+      },
+      "docker": "747c5d1509f1b8b46593c526da670e0",
+      "parent_exec_id": "bWluaWt1YmU6NTgzNzExNDcxMTQ4ODoyMTcxOA==",
+      "refcnt": 1,
+      "tid": 25874,
+      "in_init_tree": false
+    },
+    "parent": {
+      "exec_id": "bWluaWt1YmU6NTgzNzExNDcxMTQ4ODoyMTcxOA==",
+      "pid": 21718,
+      "uid": 0,
+      "cwd": "/",
+      "binary": "/usr/bin/bash",
+      "flags": "execve rootcwd",
+      "start_time": "2025-01-02T18:06:25.215753488Z",
+      "auid": 4294967295,
+      "pod": {
+        "namespace": "koney-demo",
+        "name": "koney-demo-deployment-5bcbd78875-q7lvx",
+        "container": {
+          "id": "docker://747c5d1509f1b8b46593c526da670e0609bacaea89b94238ef6cf39b333f9ec4",
+          "name": "nginx",
+          "image": {
+            "id": "docker-pullable://nginx@sha256:42e917aaa1b5bb40dd0f6f7f4f857490ac7747d7ef73b391c774a41a8b994f15",
+            "name": "nginx:latest"
+          },
+          "start_time": "2025-01-02T17:49:28Z",
+          "pid": 149
+        },
+        "pod_labels": {
+          "app": "koney-demo-pod",
+          "demo.koney/honeytoken": "true",
+          "k8s:io.kubernetes.pod.namespace": "koney-demo",
+          "pod-template-hash": "5bcbd78875"
+        },
+        "workload": "koney-demo-deployment",
+        "workload_kind": "Deployment"
+      },
+      "docker": "747c5d1509f1b8b46593c526da670e0",
+      "parent_exec_id": "bWluaWt1YmU6NTgzNzExMzgyNjY3ODoyMTcxOA==",
+      "tid": 21718,
+      "in_init_tree": false
+    },
+    "function_name": "security_file_permission",
+    "args": [
+      {
+        "file_arg": {
+          "path": "/run/secrets/koney/service_token",
+          "permission": "-r--r--r--"
+        }
+      }
+    ],
+    "return": { "int_arg": 0 },
+    "action": "KPROBE_ACTION_GETURL",
+    "policy_name": "koney-tracing-policy-f9f80361a7e931aa31da6c3665888706",
+    "return_action": "KPROBE_ACTION_GETURL"
+  },
+  "node_name": "minikube",
+  "time": "2025-01-02T18:27:10.051753376Z"
+}
