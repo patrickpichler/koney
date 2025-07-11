@@ -1,29 +1,27 @@
+# permissions for end users to edit deceptionalertexports.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/name: koney
     app.kubernetes.io/managed-by: kustomize
-  name: alert-forwarder-role
+  name: deceptionalertexport-editor-role
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - ""
-  resources:
-  - pods/log
-  verbs:
-  - get
 - apiGroups:
   - research.dynatrace.com
   resources:
   - deceptionalertexports
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
+- apiGroups:
+  - research.dynatrace.com
+  resources:
+  - deceptionalertexports/status
+  verbs:
+  - get

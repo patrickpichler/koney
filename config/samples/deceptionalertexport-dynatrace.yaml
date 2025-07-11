@@ -1,0 +1,9 @@
+apiVersion: research.dynatrace.com/v1alpha1
+kind: DeceptionAlertExport
+metadata:
+  name: deceptionalertexport-dynatrace
+  namespace: koney-system
+spec:
+  dynatrace:
+    secretName: dynatrace-api-token
+    severity: HIGH

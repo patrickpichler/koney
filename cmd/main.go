@@ -35,7 +35,7 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	koneyiov1alpha1 "github.com/dynatrace-oss/koney/api/v1alpha1"
+	researchdynatracecomv1alpha1 "github.com/dynatrace-oss/koney/api/v1alpha1"
 	"github.com/dynatrace-oss/koney/internal/controller"
 	// +kubebuilder:scaffold:imports
 )
@@ -47,9 +47,8 @@ var (
 
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-
-	utilruntime.Must(koneyiov1alpha1.AddToScheme(scheme))
 	utilruntime.Must(ciliumiov1alpha1.AddToScheme(scheme))
+	utilruntime.Must(researchdynatracecomv1alpha1.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
 
