@@ -1,4 +1,3 @@
-
 # 💻 Developer Guide
 
 This document describes how to build, test, and deploy the Koney operator.

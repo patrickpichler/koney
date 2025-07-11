@@ -320,6 +320,11 @@ kubectl logs -n koney-system -l control-plane=controller-manager -c alerts -f --
 
 ℹ️ **Note**: The `jq` command is used to format the JSON output and can also be omitted.
 
+### Exporting Alerts
+
+Koney supports sending alerts to external systems.
+Please refer to the 📄 [ALERT_EXPORT](./docs/ALERT_EXPORT.md) document to learn about `DeceptionAlertExport` resources.
+
 ## 💻 Developer Guide
 
 Please refer to the 📄 [DEVELOPER_GUIDE](./docs/DEVELOPER_GUIDE.md) document.
