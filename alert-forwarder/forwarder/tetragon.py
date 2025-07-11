@@ -102,9 +102,9 @@ def map_tetragon_event(event: dict) -> KoneyAlert:
 
     try:
         # attempt to resolve the DeceptionPolicy name (calls Kubernetes API)
-        tracing_policy_name = extract_tracing_policy_name(event)
-        deception_policy_name = resolve_deception_policy_name(tracing_policy_name)
-    except client.exceptions.ApiException:
+        if tracing_policy_name := extract_tracing_policy_name(event):
+            deception_policy_name = resolve_deception_policy_name(tracing_policy_name)
+    except client.ApiException:
         pass
 
     # infer trap type and metadata by inspecting the event
@@ -131,7 +131,7 @@ def map_tetragon_event(event: dict) -> KoneyAlert:
 
 
 def is_filtered_event(event: KoneyAlert) -> bool:
-    arguments = event.get("process", {}).get("arguments")
+    arguments = (event.get("process") or {}).get("arguments")
     if arguments:
         fingerprints = [
             encode_fingerprint_in_echo(KONEY_FINGERPRINT),
@@ -151,6 +151,7 @@ def resolve_deception_policy_name(tracing_policy_name: str) -> str:
         *TETRAGON_TRACING_POLICIES_GVP, tracing_policy_name
     )
 
+    # TODO: fix typing warnings
     return tp["metadata"]["labels"][TETRAGON_DECEPTION_POLICY_REF]
 
 
