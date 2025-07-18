@@ -1,16 +1,16 @@
-# permissions for end users to view deceptionalertexports.
+# permissions for end users to view deceptionalertsinks.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/name: koney
     app.kubernetes.io/managed-by: kustomize
-  name: deceptionalertexport-viewer-role
+  name: deceptionalertsink-viewer-role
 rules:
 - apiGroups:
   - research.dynatrace.com
   resources:
-  - deceptionalertexports
+  - deceptionalertsinks
   verbs:
   - get
   - list
@@ -18,6 +18,6 @@ rules:
 - apiGroups:
   - research.dynatrace.com
   resources:
-  - deceptionalertexports/status
+  - deceptionalertsinks/status
   verbs:
   - get

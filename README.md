@@ -323,7 +323,7 @@ kubectl logs -n koney-system -l control-plane=controller-manager -c alerts -f --
 ### Exporting Alerts
 
 Koney supports sending alerts to external systems.
-Please refer to the 📄 [ALERT_EXPORT](./docs/ALERT_EXPORT.md) document to learn about `DeceptionAlertExport` resources.
+Please refer to the 📄 [ALERT_SINKS](./docs/ALERT_SINKS.md) document to learn about `DeceptionAlertSink` resources.
 
 ## 💻 Developer Guide
 

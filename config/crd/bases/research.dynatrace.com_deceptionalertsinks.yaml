@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.16.1
-  name: deceptionalertexports.research.dynatrace.com
+  name: deceptionalertsinks.research.dynatrace.com
 spec:
   group: research.dynatrace.com
   names:
-    kind: DeceptionAlertExport
-    listKind: DeceptionAlertExportList
-    plural: deceptionalertexports
-    singular: deceptionalertexport
+    kind: DeceptionAlertSink
+    listKind: DeceptionAlertSinkList
+    plural: deceptionalertsinks
+    singular: deceptionalertsink
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: DeceptionAlertExport is the Schema for the deceptionalertexports
+        description: DeceptionAlertSink is the Schema for the deceptionalertsinks
           API
         properties:
           apiVersion:
@@ -38,10 +38,10 @@ spec:
           metadata:
             type: object
           spec:
-            description: Spec is the specification of the DeceptionAlertExportSpec.
+            description: Spec is the specification of the DeceptionAlertSinkSpec.
             properties:
               dynatrace:
-                description: Dynatrace describes export rules to Dynatrace
+                description: Dynatrace describes how to send alerts to Dynatrace
                 properties:
                   secretName:
                     description: SecretName references the name of a secret holding

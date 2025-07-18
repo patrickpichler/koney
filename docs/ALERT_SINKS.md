@@ -1,10 +1,10 @@
-# 🔔 Alert Export
+# 🔔 Alert Sinks
 
-When hackers access traps, Koney logs an event in the `alerts` container. You can also configure Koney to export these alerts to external systems. For this, you simply add an `DeceptionAlertExport` resource to your cluster.
+When hackers access traps, Koney logs an event in the `alerts` container. You can also configure Koney to send these alerts to external systems. For this, you simply add an `DeceptionAlertSink` resource to your cluster.
 
-ℹ️ **Note**: All `DeceptionAlertExport` resources and referenced `Secret` resources must be in the `koney-system` namespace. Resources in other namespaces will be ignored.
+ℹ️ **Note**: All `DeceptionAlertSink` resources and referenced `Secret` resources must be in the `koney-system` namespace. Resources in other namespaces will be ignored.
 
-At the moment, we support exporting alerts to the following systems:
+At the moment, we support sending alerts to the following systems:
 
 - [Dynatrace Security Events](#dynatrace-security-events)
 
@@ -20,13 +20,13 @@ kubectl create secret generic -n koney-system dynatrace-api-token \
   --from-literal=apiUrl=https://ENVIRONMENTID.live.dynatrace.com
 ```
 
-4. Create a `DeceptionAlertExport` resource in your cluster and point it to the `dnyatrace-api-token` secret:
+4. Create a `DeceptionAlertSink` resource in your cluster and point it to the `dnyatrace-api-token` secret:
 
 ```yaml
 apiVersion: research.dynatrace.com/v1alpha1
-kind: DeceptionAlertExport
+kind: DeceptionAlertSink
 metadata:
-  name: deceptionalertexport-dynatrace
+  name: deceptionalertsink-dynatrace
   namespace: koney-system
 spec:
   dynatrace:
@@ -39,8 +39,8 @@ The `dynatrace` section contains the following fields:
 - `secretName`: The name of the `Secret` resource containing the `apiToken` and `apiUrl` fields.
 - `severity`: The severity of the alert upon ingest. Possible values are `CRITICAL`, `HIGH`, `MEDIUM`, and `LOW`. The default value is `HIGH`.
 
-To apply a deception alert export resource, use the following command:
+To apply a deception alert sink resource, use the following command:
 
 ```sh
-kubectl apply -f <deceptionalertexport-file>.yaml
+kubectl apply -f <deceptionalertsink-file>.yaml
 ```

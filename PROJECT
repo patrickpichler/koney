@@ -22,7 +22,7 @@ resources:
     crdVersion: v1
     namespaced: true
   domain: research.dynatrace.com
-  kind: DeceptionAlertExport
+  kind: DeceptionAlertSink
   path: github.com/dynatrace-oss/koney/api/v1alpha1
   version: v1alpha1
 version: "3"

@@ -22,7 +22,7 @@ rules:
 - apiGroups:
   - research.dynatrace.com
   resources:
-  - deceptionalertexports
+  - deceptionalertsinks
   verbs:
   - get
   - list

@@ -21,34 +21,34 @@ import (
 
 // +kubebuilder:object:root=true
 
-// DeceptionAlertExport is the Schema for the deceptionalertexports API
-type DeceptionAlertExport struct {
+// DeceptionAlertSink is the Schema for the deceptionalertsinks API
+type DeceptionAlertSink struct {
 	metav1.TypeMeta `json:",inline"`
 
 	// Standard object's metadata.
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec is the specification of the DeceptionAlertExportSpec.
-	Spec DeceptionAlertExportSpec `json:"spec,omitempty"`
+	// Spec is the specification of the DeceptionAlertSinkSpec.
+	Spec DeceptionAlertSinkSpec `json:"spec,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// DeceptionAlertExportList contains a list of DeceptionAlertExport
-type DeceptionAlertExportList struct {
+// DeceptionAlertSinkList contains a list of DeceptionAlertSink
+type DeceptionAlertSinkList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []DeceptionAlertExport `json:"items"`
+	Items           []DeceptionAlertSink `json:"items"`
 }
 
-// DeceptionAlertExportSpec defines the desired state of DeceptionAlertExport
-type DeceptionAlertExportSpec struct {
-	// Dynatrace describes export rules to Dynatrace
-	Dynatrace DynatraceExportSpec `json:"dynatrace,omitempty" yaml:"dynatrace,omitempty"`
+// DeceptionAlertSinkSpec defines the desired state of DeceptionAlertSink
+type DeceptionAlertSinkSpec struct {
+	// Dynatrace describes how to send alerts to Dynatrace
+	Dynatrace DynatraceSinkSpec `json:"dynatrace,omitempty" yaml:"dynatrace,omitempty"`
 }
 
-type DynatraceExportSpec struct {
+type DynatraceSinkSpec struct {
 	// SecretName references the name of a secret holding `apiToken` and `apiUrl` to connect to the Dynatrace environment.
 	SecretName string `json:"secretName,omitempty" yaml:"secretName,omitempty"`
 
@@ -60,5 +60,5 @@ type DynatraceExportSpec struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&DeceptionAlertExport{}, &DeceptionAlertExportList{})
+	SchemeBuilder.Register(&DeceptionAlertSink{}, &DeceptionAlertSinkList{})
 }
