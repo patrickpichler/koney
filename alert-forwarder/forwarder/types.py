@@ -27,7 +27,12 @@ class PodMetadata(TypedDict):
     container: ContainerMetadata
 
 
+class NodeMetadata(TypedDict):
+    name: str
+
+
 class ProcessMetadata(TypedDict):
+    uid: int
     pid: int
     cwd: str
     binary: str
@@ -47,4 +52,5 @@ class KoneyAlert(TypedDict):
     # optional metadata that can be present depending on the trap type
     metadata: dict
     pod: PodMetadata | None
+    node: NodeMetadata | None
     process: ProcessMetadata | None

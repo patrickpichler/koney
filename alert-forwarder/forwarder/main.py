@@ -21,7 +21,7 @@ from fastapi import BackgroundTasks, FastAPI, Response, status
 from kubernetes import config
 from rich.console import Console
 
-from .tetragon import is_filtered_event, map_tetragon_event, read_tetragon_events
+from .tetragon import is_filtered_alert, map_tetragon_event, read_tetragon_events
 
 # various error messages
 K8S_AUTH_ERROR = "failed to authenticate with Kubernetes API"
@@ -60,8 +60,8 @@ def load_new_alerts(timestamp: float):
 
     # TODO: if we are spammed with triggers, we never ever execute this code, fix that
 
+    # resolve tetragon events
     events_per_policy = read_tetragon_events()
-
     if not events_per_policy:
         return
 
@@ -70,14 +70,15 @@ def load_new_alerts(timestamp: float):
             console.print(f"Transforming {len(events)} alerts for policy {policy_name}")
 
         for event in events:
-            koney_event = map_tetragon_event(event)
-            if is_filtered_event(koney_event):
+            koney_alert = map_tetragon_event(event)
+            if is_filtered_alert(koney_alert):
                 if logger.level <= logging.DEBUG:
-                    console.print(f"Skipping event ", koney_event)
+                    console.print(f"Skipping event ", koney_alert)
                 continue
 
-            koney_event_str = json.dumps(koney_event)
-            console.print(koney_event_str, soft_wrap=True)
+            # write to stdout
+            koney_alert_str = json.dumps(koney_alert)
+            console.print(koney_alert_str, soft_wrap=True)
 
 
 @app.get("/healthz", status_code=status.HTTP_204_NO_CONTENT)

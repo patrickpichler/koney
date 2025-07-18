@@ -16,6 +16,7 @@
 import json
 import re
 from collections import defaultdict
+from typing import cast
 
 from kubernetes import client
 
@@ -24,7 +25,13 @@ from .fingerprint import (
     encode_fingerprint_in_cat,
     encode_fingerprint_in_echo,
 )
-from .types import ContainerMetadata, KoneyAlert, PodMetadata, ProcessMetadata
+from .types import (
+    ContainerMetadata,
+    KoneyAlert,
+    NodeMetadata,
+    PodMetadata,
+    ProcessMetadata,
+)
 
 # group, version, plural of the Tetragon TracingPolicy CRD
 TETRAGON_TRACING_POLICIES_GVP = "cilium.io", "v1alpha1", "tracingpolicies"
@@ -40,10 +47,6 @@ TETRAGON_POD_CONTAINER_NAME = "export-stdout"
 # the label key that references the deception policy in a tracing policy
 TETRAGON_DECEPTION_POLICY_REF = "koney/deception-policy"
 
-# various error messages
-K8S_POLICY_RESOLUTION_ERROR = "failed to resolve DeceptionPolicy name"
-K8S_TRAP_TYPE_RESOLUTION_ERROR = "failed to resolve trap type and metadata"
-
 # stores hashes of already processed events to prevent duplicates
 event_cache = set()
 
@@ -51,10 +54,16 @@ event_cache = set()
 def read_tetragon_events(since_seconds=60) -> dict[str, list[dict]]:
     v1 = client.CoreV1Api()
 
-    pod_list = v1.list_namespaced_pod(
-        namespace=TETRAGON_NAMESPACE,
-        label_selector=TETRAGON_POD_LABEL_SELECTOR,
+    pod_list = cast(
+        client.V1PodList,
+        v1.list_namespaced_pod(
+            namespace=TETRAGON_NAMESPACE,
+            label_selector=TETRAGON_POD_LABEL_SELECTOR,
+        ),
     )
+
+    if not pod_list.items:
+        return {}  # no Tetragon pods found
 
     events_per_policy = defaultdict(list)
     for pod in pod_list.items:
@@ -79,7 +88,7 @@ def read_tetragon_events(since_seconds=60) -> dict[str, list[dict]]:
             # parse and check the referenced policy name
             event = json.loads(line)
 
-            if (policy_name := extract_tracing_policy_name(event)) is not None:
+            if policy_name := _extract_tracing_policy_name(event):
                 if not policy_name.startswith(TETRAGON_POLICY_PREFIX):
                     continue
 
@@ -102,22 +111,20 @@ def map_tetragon_event(event: dict) -> KoneyAlert:
 
     try:
         # attempt to resolve the DeceptionPolicy name (calls Kubernetes API)
-        if tracing_policy_name := extract_tracing_policy_name(event):
-            deception_policy_name = resolve_deception_policy_name(tracing_policy_name)
+        if tracing_policy_name := _extract_tracing_policy_name(event):
+            deception_policy_name = _resolve_deception_policy_name(tracing_policy_name)
     except client.ApiException:
         pass
 
     # infer trap type and metadata by inspecting the event
-    if "process_kprobe" in event:
-        k = event["process_kprobe"]
-        file_access_fn = ("security_file_permission", "security_mmap_file")
-        if k.get("function_name") in file_access_fn:
+    if kprobe := event.get("process_kprobe"):
+        if meta := _extract_metadata_for_filesystem_honeytoken(kprobe):
             trap_type = "filesystem_honeytoken"
-            file_path = k.get("args", [{}])[0].get("file_arg", {}).get("path")
-            metadata["file_path"] = file_path
+            metadata = meta
 
-    pod = extract_pod_metadata(event)
-    process = extract_process_metadata(event)
+    pod = _extract_pod_metadata(event)
+    node = _extract_node_metadata(event)
+    process = _extract_process_metadata(event)
 
     # TODO: emit errors if we fail to resolve fields
     return KoneyAlert(
@@ -126,71 +133,86 @@ def map_tetragon_event(event: dict) -> KoneyAlert:
         trap_type=trap_type,
         metadata=metadata,
         pod=pod,
+        node=node,
         process=process,
     )
 
 
-def is_filtered_event(event: KoneyAlert) -> bool:
-    arguments = (event.get("process") or {}).get("arguments")
-    if arguments:
-        fingerprints = [
-            encode_fingerprint_in_echo(KONEY_FINGERPRINT),
-            encode_fingerprint_in_cat(KONEY_FINGERPRINT),
-        ]
+def is_filtered_alert(alert: KoneyAlert) -> bool:
+    if not alert["process"] or not alert["process"]["arguments"]:
+        return False  # cannot decide, assume not filtered
 
-        # if any fingerprint is present, filter this event
-        return any(fp in arguments for fp in fingerprints)
+    arguments = alert["process"]["arguments"]
+    fingerprints = [
+        encode_fingerprint_in_echo(KONEY_FINGERPRINT),
+        encode_fingerprint_in_cat(KONEY_FINGERPRINT),
+    ]
 
-    # assume not filtered
-    return False
+    # if any fingerprint is present, filter this event
+    return any(fp in arguments for fp in fingerprints)
 
 
-def resolve_deception_policy_name(tracing_policy_name: str) -> str:
+###############################################################################
+
+
+def _resolve_deception_policy_name(tracing_policy_name: str) -> str | None:
     api = client.CustomObjectsApi()
-    tp = api.get_cluster_custom_object(
-        *TETRAGON_TRACING_POLICIES_GVP, tracing_policy_name
+    tracing_policy = cast(
+        dict,
+        api.get_cluster_custom_object(
+            *TETRAGON_TRACING_POLICIES_GVP, tracing_policy_name
+        ),
     )
 
-    # TODO: fix typing warnings
-    return tp["metadata"]["labels"][TETRAGON_DECEPTION_POLICY_REF]
+    return (
+        tracing_policy.get("metadata", {})
+        .get("labels", {})
+        .get(TETRAGON_DECEPTION_POLICY_REF)
+    )
 
 
-def extract_tracing_policy_name(event: dict) -> str | None:
+def _extract_tracing_policy_name(event: dict) -> str | None:
     # keys might be process_kprobe, process_uprobe, ...
-    for key in event.keys():
-        if "policy_name" in event[key]:
-            return event[key]["policy_name"]
+    for value in event.values():
+        if policy_name := value.get("policy_name"):
+            return policy_name
 
 
-def extract_pod_metadata(event: dict) -> PodMetadata | None:
+def _extract_pod_metadata(event: dict) -> PodMetadata | None:
     # keys might be process_kprobe, process_uprobe, ...
-    for key in event.keys():
-        if "process" not in event[key]:
-            continue
-        if "pod" not in event[key]["process"]:
-            continue
-
-        p = event[key]["process"]["pod"]
-        return PodMetadata(
-            name=p.get("name"),
-            namespace=p.get("namespace"),
-            container=ContainerMetadata(
-                id=p.get("container", {}).get("id"),
-                name=p.get("container", {}).get("name"),
-            ),
-        )
+    for value in event.values():
+        if pod := value.get("process", {}).get("pod"):
+            return PodMetadata(
+                name=pod.get("name"),
+                namespace=pod.get("namespace"),
+                container=ContainerMetadata(
+                    id=pod.get("container", {}).get("id"),
+                    name=pod.get("container", {}).get("name"),
+                ),
+            )
 
 
-def extract_process_metadata(event: dict) -> ProcessMetadata | None:
+def _extract_node_metadata(event: dict) -> NodeMetadata | None:
+    if node_name := event.get("node_name"):
+        return NodeMetadata(name=node_name)
+    return None
+
+
+def _extract_process_metadata(event: dict) -> ProcessMetadata | None:
     # keys might be process_kprobe, process_uprobe, ...
-    for key in event.keys():
-        if "process" not in event[key]:
-            continue
+    for value in event.values():
+        if process := value.get("process"):
+            return ProcessMetadata(
+                uid=process.get("uid"),
+                pid=process.get("pid"),
+                cwd=process.get("cwd"),
+                binary=process.get("binary"),
+                arguments=process.get("arguments"),
+            )
 
-        p = event[key]["process"]
-        return ProcessMetadata(
-            pid=p.get("pid"),
-            cwd=p.get("cwd"),
-            binary=p.get("binary"),
-            arguments=p.get("arguments"),
-        )
+
+def _extract_metadata_for_filesystem_honeytoken(kprobe: dict) -> dict | None:
+    file_access_fn = ("security_file_permission", "security_mmap_file")
+    if kprobe.get("function_name") in file_access_fn:
+        file_path = kprobe.get("args", [{}])[0].get("file_arg", {}).get("path")
+        return dict(file_path=file_path)

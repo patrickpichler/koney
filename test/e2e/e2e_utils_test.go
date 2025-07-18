@@ -50,6 +50,7 @@ type KoneyAlert struct {
 		} `json:"container"`
 	} `json:"pod"`
 	Process struct {
+		Uid       int    `json:"uid"`
 		Pid       int    `json:"pid"`
 		Cwd       string `json:"cwd"`
 		Binary    string `json:"binary"`
@@ -381,6 +382,7 @@ func verifyHoneytokenAndAwaitAlert(
 			Expect(alert.Pod.Container.Name).To(BeElementOf(containers))
 
 			Expect(alert.Process).NotTo(BeNil())
+			Expect(alert.Process.Uid).To(BeZero())
 			Expect(alert.Process.Pid).NotTo(BeZero())
 			Expect(alert.Process.Cwd).To(Equal("/"))
 			Expect(alert.Process.Binary).To(Equal("/usr/bin/cat"))

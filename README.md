@@ -304,6 +304,7 @@ Koney automatically collects alerts from the Tetragon operator and logs them in 
     }
   },
   "process": {
+    "uid": 0,
     "pid": 148373,
     "cwd": "/",
     "binary": "/usr/bin/cat",
