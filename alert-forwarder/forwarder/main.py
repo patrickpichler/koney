@@ -21,10 +21,13 @@ from fastapi import BackgroundTasks, FastAPI, Response, status
 from kubernetes import config
 from rich.console import Console
 
+from .sink import read_alert_sinks, send_alert
 from .tetragon import is_filtered_alert, map_tetragon_event, read_tetragon_events
 
 # various error messages
 K8S_AUTH_ERROR = "failed to authenticate with Kubernetes API"
+K8S_SINK_READ_ERROR = "failed to read DeceptionAlertSink objects"
+SINK_SEND_ERROR = "failed to send alert to external system"
 
 # the delay after receiving a (possibly multiple) triggers until we start loading alerts (once)
 DEBOUNCE_SECONDS = 5
@@ -65,6 +68,16 @@ def load_new_alerts(timestamp: float):
     if not events_per_policy:
         return
 
+    # resolve alert sinks
+    alert_sinks = []
+    try:
+        alert_sinks = read_alert_sinks()
+    except:
+        if logger.level <= logging.ERROR:
+            console.print(K8S_SINK_READ_ERROR, style="bold red")
+            console.print_exception()
+
+    # iterate over Tetragon events, map, log, and send alerts
     for policy_name, events in events_per_policy.items():
         if logger.level <= logging.DEBUG:
             console.print(f"Transforming {len(events)} alerts for policy {policy_name}")
@@ -79,6 +92,15 @@ def load_new_alerts(timestamp: float):
             # write to stdout
             koney_alert_str = json.dumps(koney_alert)
             console.print(koney_alert_str, soft_wrap=True)
+
+            # send to external systems
+            for sink in alert_sinks:
+                try:
+                    send_alert(koney_alert, sink)
+                except:
+                    if logger.level <= logging.ERROR:
+                        console.print(SINK_SEND_ERROR, style="bold red")
+                        console.print_exception()
 
 
 @app.get("/healthz", status_code=status.HTTP_204_NO_CONTENT)

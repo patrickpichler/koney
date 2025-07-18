@@ -54,3 +54,17 @@ class KoneyAlert(TypedDict):
     pod: PodMetadata | None
     node: NodeMetadata | None
     process: ProcessMetadata | None
+
+
+DynatraceSeverity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+
+
+class DynatraceSink(TypedDict):
+    api_url: str
+    api_token: str
+    severity: DynatraceSeverity
+
+
+class AlertSink(TypedDict):
+    name: str
+    dynatrace_sink: DynatraceSink | None
