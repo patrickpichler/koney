@@ -74,6 +74,7 @@ Deception alerts sent to the `/platform/ingest/v1/events.security` endpoint will
   "finding.severity": "HIGH",
 
   "dt.security.risk.level": "HIGH",
+  "dt.security.risk.score": 8.9,
 
   "product.name": "Koney",
   "product.vendor": "Dynatrace Research",

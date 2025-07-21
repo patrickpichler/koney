@@ -54,6 +54,18 @@ def map_to_dynatrace_event(
     process_binary_name = process_binary.name
     process_binary_path = str(process_binary.parent)
 
+    # map severity text to risk score
+    risk_score = 0
+    severity_norm = severity.lower()
+    if severity_norm == "low":
+        risk_score = 3.9
+    elif severity_norm == "medium":
+        risk_score = 6.9
+    elif severity_norm == "high":
+        risk_score = 8.9
+    elif severity_norm == "critical":
+        risk_score = 10.0
+
     # TODO: bump event.version
     payload = {
         "timestamp": koney_alert["timestamp"],
@@ -79,6 +91,7 @@ def map_to_dynatrace_event(
         "finding.severity": severity,
         # security event metadata
         "dt.security.risk.level": severity,
+        "dt.security.risk.score": risk_score,
         # product metadata
         "product.name": "Koney",
         "product.vendor": "Dynatrace Research",
