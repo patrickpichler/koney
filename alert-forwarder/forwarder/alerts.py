@@ -38,7 +38,9 @@ def create_alert_description(koney_alert: KoneyAlert) -> str:
 
 
 def map_to_dynatrace_event(
-    koney_alert: KoneyAlert, severity: DynatraceSeverity
+    koney_alert: KoneyAlert,
+    severity: DynatraceSeverity,
+    cluster_uid: str | None = None,
 ) -> dict:
     # create ids and descriptions
     alert_id = create_alert_id(koney_alert)
@@ -96,6 +98,7 @@ def map_to_dynatrace_event(
         "product.name": "Koney",
         "product.vendor": "Dynatrace Research",
         # kubernetes metadata
+        "k8s.cluster.uid": cluster_uid,
         "k8s.namespace.name": pod_dict.get("namespace"),
         "k8s.node.name": node_dict.get("name"),
         "k8s.pod.name": pod_dict.get("name"),
@@ -111,9 +114,6 @@ def map_to_dynatrace_event(
         # source object metadata (for enrichment)
         "object.type": "KUBERNETES_CONTAINER",
         "object.id": pod_dict["container"].get("id"),
-        # not collected by Koney
-        # "k8s.cluster.name": "",
-        # "k8s.pod.uid": "",
     }
 
     return payload

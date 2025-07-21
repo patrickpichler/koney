@@ -15,6 +15,7 @@
 
 import base64
 import logging
+from functools import cache
 from typing import cast
 
 import requests
@@ -52,12 +53,14 @@ def read_alert_sinks() -> list[AlertSink]:
 
 
 def send_alert(koney_alert: KoneyAlert, sink: AlertSink) -> None:
+    cluster_uid = _get_cluster_uid()
+
     if sink["dynatrace_sink"]:
         api_url = sink["dynatrace_sink"]["api_url"]
         api_token = sink["dynatrace_sink"]["api_token"]
         severity = sink["dynatrace_sink"]["severity"]
 
-        payload = map_to_dynatrace_event(koney_alert, severity)
+        payload = map_to_dynatrace_event(koney_alert, severity, cluster_uid)
         if logger.level <= logging.DEBUG:
             console.print("Sending alert to Dynatrace:", payload)
 
@@ -124,3 +127,13 @@ def _get_decoded_secret_data(secret_name: str) -> dict | None:
         decoded_data[key] = base64.b64decode(value).decode("utf-8")
 
     return decoded_data
+
+
+@cache
+def _get_cluster_uid() -> str | None:
+    # get the uid of the kube-system namespace
+    api = client.CoreV1Api()
+    namespace = cast(client.V1Namespace, api.read_namespace("kube-system"))
+    if not namespace.metadata or not namespace.metadata.uid:
+        return None
+    return namespace.metadata.uid
