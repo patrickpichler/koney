@@ -49,6 +49,9 @@ type KoneyAlert struct {
 			Name string `json:"name"`
 		} `json:"container"`
 	} `json:"pod"`
+	Node struct {
+		Name string `json:"name"`
+	}
 	Process struct {
 		Uid       int    `json:"uid"`
 		Pid       int    `json:"pid"`
@@ -380,6 +383,9 @@ func verifyHoneytokenAndAwaitAlert(
 			Expect(alert.Pod.Namespace).To(Equal(podNamespace))
 			Expect(alert.Pod.Container.Id).NotTo(BeEmpty())
 			Expect(alert.Pod.Container.Name).To(BeElementOf(containers))
+
+			Expect(alert.Node).NotTo(BeNil())
+			Expect(alert.Node.Name).NotTo(BeNil())
 
 			Expect(alert.Process).NotTo(BeNil())
 			Expect(alert.Process.Uid).To(BeZero())

@@ -303,6 +303,9 @@ Koney automatically collects alerts from the Tetragon operator and logs them in 
       "name": "nginx"
     }
   },
+  "node": {
+    "name": "minikube"
+  },
   "process": {
     "uid": 0,
     "pid": 148373,
