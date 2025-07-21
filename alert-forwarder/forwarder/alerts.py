@@ -95,9 +95,9 @@ def map_to_dynatrace_event(
         "process.pid": process_dict.get("pid"),
         "process.uid": process_dict.get("uid"),
         "process.cwd": process_dict.get("cwd"),
-        # TODO: object metadata (for enrichment)
-        "object.id": "",
-        "object.type": "",
+        # source object metadata (for enrichment)
+        "object.type": "KUBERNETES_CONTAINER",
+        "object.id": pod_dict["container"].get("id"),
         # not collected by Koney
         # "k8s.cluster.name": "",
         # "k8s.pod.uid": "",

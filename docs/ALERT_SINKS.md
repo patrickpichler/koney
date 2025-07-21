@@ -91,7 +91,7 @@ Deception alerts sent to the `/platform/ingest/v1/events.security` endpoint will
   "process.uid": 0,
   "process.cwd": "/",
 
-  "object.id": "",
-  "object.type": "",
+  "object.type": "KUBERNETES_CONTAINER_ID",
+  "object.id": "containerd://6f5ab819f146ffd24745bac5d3dc2c3d4071c504366fb85b416a7a500de144d9",
 }
 ```
