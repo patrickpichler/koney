@@ -186,10 +186,17 @@ def _extract_pod_metadata(event: dict) -> PodMetadata | None:
                 name=pod.get("name"),
                 namespace=pod.get("namespace"),
                 container=ContainerMetadata(
-                    id=pod.get("container", {}).get("id"),
+                    id=_normalize_container_id(pod.get("container", {}).get("id")),
                     name=pod.get("container", {}).get("name"),
                 ),
             )
+
+
+def _normalize_container_id(container_id: str) -> str:
+    if container_id is None:
+        return None
+    scheme_pattern = r"^\w+://"  # remove prefixes such as "docker://"
+    return re.sub(scheme_pattern, "", container_id).strip()
 
 
 def _extract_node_metadata(event: dict) -> NodeMetadata | None:

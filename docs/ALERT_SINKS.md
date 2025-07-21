@@ -83,7 +83,7 @@ Deception alerts sent to the `/platform/ingest/v1/events.security` endpoint will
   "k8s.node.name": "minikube",
   "k8s.pod.name": "koney-demo-deployment-8f9cb7b9c-q4fxl",
   "k8s.container.name": "nginx",
-  "k8s.container.id": "containerd://6f5ab819f146ffd24745bac5d3dc2c3d4071c504366fb85b416a7a500de144d9",
+  "k8s.container.id": "6f5ab819f146ffd24745bac5d3dc2c3d4071c504366fb85b416a7a500de144d9",
 
   "process.executable.name": "cat",
   "process.executable.path": "/usr/bin",
@@ -93,6 +93,6 @@ Deception alerts sent to the `/platform/ingest/v1/events.security` endpoint will
   "process.cwd": "/",
 
   "object.type": "KUBERNETES_CONTAINER_ID",
-  "object.id": "containerd://6f5ab819f146ffd24745bac5d3dc2c3d4071c504366fb85b416a7a500de144d9",
+  "object.id": "6f5ab819f146ffd24745bac5d3dc2c3d4071c504366fb85b416a7a500de144d9",
 }
 ```

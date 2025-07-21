@@ -299,7 +299,7 @@ Koney automatically collects alerts from the Tetragon operator and logs them in 
     "name": "koney-demo-deployment-5bcbd78875-45qpn",
     "namespace": "koney-demo",
     "container": {
-      "id": "docker://e19c1827e255ce7a5c5fd74eb4ee861388f83a16410effd65e30d3b051cd815f",
+      "id": "e19c1827e255ce7a5c5fd74eb4ee861388f83a16410effd65e30d3b051cd815f",
       "name": "nginx"
     }
   },
