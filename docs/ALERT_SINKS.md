@@ -47,7 +47,7 @@ kubectl apply -f <deceptionalertsink-file>.yaml
 
 ### Dynatrace Sink Format
 
-Deception alerts sent to the `/platform/ingest/v1/events.security` endpoint will have the following format:
+Deception alerts sent to the `/platform/ingest/v1/security.events` endpoint will have the following format:
 
 ```yaml
 {
@@ -65,8 +65,7 @@ Deception alerts sent to the `/platform/ingest/v1/events.security` endpoint will
   "event.id": "C85DB174F28C4FDD0892C4B8F280A86B",
   "event.description": "Access to honeytoken (/run/secrets/koney/service_token) in pod (koney-demo/koney-demo-deployment-8f9cb7b9c-q4fxl) detected",
 
-  "detection.type": "KONEY_ALERT",
-
+  "finding.type": "KONEY_ALERT",
   "finding.id": "C85DB174F28C4FDD0892C4B8F280A86B",
   "finding.title": "Access to honeytoken (/run/secrets/koney/service_token) in pod (koney-demo/koney-demo-deployment-8f9cb7b9c-q4fxl) detected",
   "finding.description": "Access to honeytoken (/run/secrets/koney/service_token) in pod (koney-demo/koney-demo-deployment-8f9cb7b9c-q4fxl) detected",

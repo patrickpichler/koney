@@ -83,9 +83,8 @@ def map_to_dynatrace_event(
         "event.version": "2025-07-18",
         "event.id": alert_id,
         "event.description": alert_description,
-        # detection metadata
-        "detection.type": "KONEY_ALERT",
         # security finding metadata
+        "finding.type": "KONEY_ALERT",
         "finding.id": alert_id,
         "finding.title": alert_description,
         "finding.description": alert_description,

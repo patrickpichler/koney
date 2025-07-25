@@ -64,9 +64,8 @@ def send_alert(koney_alert: KoneyAlert, sink: AlertSink) -> None:
         if logger.level <= logging.DEBUG:
             console.print("Sending alert to Dynatrace:", payload)
 
-        # TODO: migrate to security.events eventually?
         resp = requests.post(
-            f"{api_url}/platform/ingest/v1/events.security",
+            f"{api_url}/platform/ingest/v1/security.events",
             json=payload,
             headers={
                 "Authorization": f"Api-Token {api_token}",
