@@ -1,8 +1,9 @@
 # 🔔 Alert Sinks
 
-When hackers access traps, Koney logs an event in the `alerts` container. You can also configure Koney to send these alerts to external systems. For this, you simply add an `DeceptionAlertSink` resource to your cluster.
+When hackers access traps, Koney logs an event in the `alerts` container. You can also configure Koney to send these alerts to external systems. For this, you simply add an `DeceptionAlertSink` resource to your cluster. Forwarding is supported for all trap types.
 
 ℹ️ **Note**: All `DeceptionAlertSink` resources and referenced `Secret` resources must be in the `koney-system` namespace. Resources in other namespaces will be ignored.
+
 
 At the moment, we support sending alerts to the following systems:
 
@@ -20,7 +21,7 @@ kubectl create secret generic -n koney-system dynatrace-api-token \
   --from-literal=apiUrl=https://ENVIRONMENTID.live.dynatrace.com
 ```
 
-4. Create a `DeceptionAlertSink` resource in your cluster and point it to the `dnyatrace-api-token` secret:
+4. Create a `DeceptionAlertSink` resource in your cluster and point it to the `dynatrace-api-token` secret:
 
 ```yaml
 apiVersion: research.dynatrace.com/v1alpha1

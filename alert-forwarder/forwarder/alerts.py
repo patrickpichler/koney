@@ -21,7 +21,7 @@ from .types import DynatraceSeverity, KoneyAlert
 
 
 def create_alert_id(koney_alert: KoneyAlert) -> str:
-    koney_alert_str = json.dumps(koney_alert)
+    koney_alert_str = json.dumps(koney_alert, sort_keys=True)
     event_hash = md5(koney_alert_str.encode("utf-8"))
     return event_hash.hexdigest().upper()
 
@@ -68,7 +68,6 @@ def map_to_dynatrace_event(
     elif severity_norm == "critical":
         risk_score = 10.0
 
-    # TODO: bump event.version
     payload = {
         "timestamp": koney_alert["timestamp"],
         # koney metadata (flattened)
@@ -80,7 +79,7 @@ def map_to_dynatrace_event(
         "event.type": "DETECTION_FINDING",
         "event.name": "Detection finding event",
         "event.provider": "Koney",
-        "event.version": "2025-07-18",
+        "event.version": "2025-08-12",
         "event.id": alert_id,
         "event.description": alert_description,
         # security finding metadata

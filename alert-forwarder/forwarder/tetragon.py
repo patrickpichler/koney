@@ -85,9 +85,12 @@ def read_tetragon_events(since_seconds=60) -> dict[str, list[dict]]:
             time_pattern = r'("time":"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.\d{9}(Z")'
             line = re.sub(time_pattern, r"\1\2", line)
 
-            # parse and check the referenced policy name
-            event = json.loads(line)
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue  # skip non-json lines in the logs
 
+            # parse and check the referenced policy name
             if policy_name := _extract_tracing_policy_name(event):
                 if not policy_name.startswith(TETRAGON_POLICY_PREFIX):
                     continue

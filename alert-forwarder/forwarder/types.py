@@ -62,6 +62,7 @@ DynatraceSeverity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
 class DynatraceSink(TypedDict):
     api_url: str
     api_token: str
+    # TODO (#27): specify severity in the policy, not in the sink!
     severity: DynatraceSeverity
 
 

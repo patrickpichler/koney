@@ -36,6 +36,9 @@ KONEY_DECEPTION_ALERT_SINK_GVNP = (
     "deceptionalertsinks",
 )
 
+# number of seconds after we timeout requests to external systems
+SINK_REQUEST_TIMEOUT = 25
+
 logger = logging.getLogger("uvicorn.error")
 console = Console()
 
@@ -67,6 +70,7 @@ def send_alert(koney_alert: KoneyAlert, sink: AlertSink) -> None:
         resp = requests.post(
             f"{api_url}/platform/ingest/v1/security.events",
             json=payload,
+            timeout=SINK_REQUEST_TIMEOUT,
             headers={
                 "Authorization": f"Api-Token {api_token}",
                 "Content-Type": "application/json",

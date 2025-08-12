@@ -61,7 +61,7 @@ def load_new_alerts(timestamp: float):
     if timestamp < most_recent_trigger:
         return  # another trigger was received in the meantime
 
-    # TODO: if we are spammed with triggers, we never ever execute this code, fix that
+    # TODO (#29): if we are spammed with triggers, we never ever execute this code, fix that
 
     # resolve tetragon events
     events_per_policy = read_tetragon_events()
