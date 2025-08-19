@@ -12,8 +12,8 @@ At the moment, we support sending alerts to the following systems:
 ## Dynatrace Security Events
 
 1. Open the **'Access Tokens'** app in your Dynatrace environment
-2. Create a new access token with scope `openpipeline.events_security`
-3. Store the API token in a `Secret` resource in the `koney-system` namespace
+2. Create a new access token with scope `openpipeline.events_security`. Follow the [official documentation](https://docs.dynatrace.com/docs/shortlink/api-authentication#token-format-prefixes) for more information.
+3. Store the created token and your [environment ID](https://docs.dynatrace.com/docs/shortlink/monitoring-environment#environment-id) in a `Secret` resource in the `koney-system` namespace
 
 ```yaml
 kubectl create secret generic -n koney-system dynatrace-api-token \
