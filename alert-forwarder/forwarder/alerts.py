@@ -19,6 +19,13 @@ from pathlib import Path
 
 from .types import DynatraceSeverity, KoneyAlert
 
+DYNATRACE_SEVERITY_RISK_SCORES = {
+    "low": 3.9,
+    "medium": 6.9,
+    "high": 8.9,
+    "critical": 10.0,
+}
+
 
 def create_alert_id(koney_alert: KoneyAlert) -> str:
     koney_alert_str = json.dumps(koney_alert, sort_keys=True)
@@ -57,16 +64,7 @@ def map_to_dynatrace_event(
     process_binary_path = str(process_binary.parent)
 
     # map severity text to risk score
-    risk_score = 0
-    severity_norm = severity.lower()
-    if severity_norm == "low":
-        risk_score = 3.9
-    elif severity_norm == "medium":
-        risk_score = 6.9
-    elif severity_norm == "high":
-        risk_score = 8.9
-    elif severity_norm == "critical":
-        risk_score = 10.0
+    risk_score = DYNATRACE_SEVERITY_RISK_SCORES.get(severity.lower(), 0.0)
 
     payload = {
         "timestamp": koney_alert["timestamp"],

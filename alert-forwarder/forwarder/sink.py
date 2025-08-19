@@ -49,8 +49,11 @@ def read_alert_sinks() -> list[AlertSink]:
 
     alert_sinks = []
     for obj in objs.get("items", []):
-        if alert_sink := _get_alert_sink(obj.get("metadata", {}).get("name")):
-            alert_sinks.append(alert_sink)
+        alert_sink = AlertSink(
+            name=obj.get("metadata", {}).get("name"),
+            dynatrace_sink=_extract_dynatrace_sink(obj),
+        )
+        alert_sinks.append(alert_sink)
 
     return alert_sinks
 
@@ -85,22 +88,6 @@ def send_alert(koney_alert: KoneyAlert, sink: AlertSink) -> None:
 
 
 ###############################################################################
-
-
-def _get_alert_sink(alert_sink_name: str) -> AlertSink:
-    api = client.CustomObjectsApi()
-    obj = cast(
-        dict,
-        api.get_namespaced_custom_object(
-            *KONEY_DECEPTION_ALERT_SINK_GVNP,
-            alert_sink_name,
-        ),
-    )
-
-    return AlertSink(
-        name=obj.get("metadata", {}).get("name"),
-        dynatrace_sink=_extract_dynatrace_sink(obj),
-    )
 
 
 def _extract_dynatrace_sink(obj: dict) -> DynatraceSink | None:
